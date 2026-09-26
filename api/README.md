@@ -87,6 +87,19 @@ Runs on **port 5173** by default.
 
 ---
 
+## 8. Run the tests
+
+Build the test database with migrations. Don't use `db:schema:load`: `schema.rb` can't create the `ai_interview` schema.
+
+```bash
+RAILS_ENV=test bundle exec rails db:create db:migrate
+bundle exec rspec
+```
+
+Specs never call Gemini: webmock blocks every real HTTP call. The coverage report is written to `coverage/index.html`.
+
+---
+
 ## All services at a glance
 
 | Service | Command | Port |
