@@ -13,7 +13,7 @@ export interface Lede {
 
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
-// The brief's one read: harm first, then work and what is live (design 04 HD-02).
+// The brief's one read: harm first, then work and what is live.
 // A zero clause is never printed. "New" is only said when the page knows the last visit.
 export function buildLede(summary: HomeSummary, resultsThisWeek: number): Lede {
   const harm: LedePart[] = [];

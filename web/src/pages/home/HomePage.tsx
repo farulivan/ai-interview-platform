@@ -7,19 +7,23 @@ import { LiveNow, NeedsYou, ResultsToRead } from "@/components/home/DeskSections
 import { usePolling } from "@/hooks/usePolling";
 import { homeApi } from "@/services/home";
 import { buildLede } from "@/lib/lede";
+import { readLastVisit, rememberVisit } from "@/lib/lastVisit";
 import { clockTime, greeting, longDate, relativeTime } from "@/lib/time";
 import type { HomeDesk } from "@/types/home";
 
-// The review desk (design dashboard-uiux 02, 04): what needs a person now.
+// The review desk: what needs a person now.
 export default function HomePage() {
   const [desk, setDesk] = useState<HomeDesk | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  // Read once per page view. This visit then becomes the next one's "last visit".
+  const [since] = useState(() => readLastVisit());
+  useEffect(() => rememberVisit(new Date()), []);
 
   const load = useCallback(async () => {
     try {
-      const res = await homeApi.get();
+      const res = await homeApi.get(since);
       setDesk(res.data);
       setUpdatedAt(new Date());
       setFailed(false);
@@ -28,7 +32,7 @@ export default function HomePage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [since]);
 
   useEffect(() => {
     document.title = "Home · Rakamin AI Interview";

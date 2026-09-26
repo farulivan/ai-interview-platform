@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import type { SkillStatus } from "@/types";
 
 // One mark per configured skill, drawn so the four states read apart even in
-// grayscale (design dashboard-uiux 03 §3): solid, outlined, dashed, slashed.
+// grayscale: solid, outlined, dashed, slashed.
 const MARK: Record<SkillStatus, string> = {
   assessed: "bg-primary",
   thin_evidence: "bg-background border-[1.5px] border-attention-line",
