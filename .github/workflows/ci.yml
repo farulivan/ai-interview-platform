@@ -41,7 +41,7 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_USER: postgres
-          # Throwaway database for tests, so no password is needed.
+          # Throwaway test database that only this job can reach, so no password is needed.
           POSTGRES_HOST_AUTH_METHOD: trust
         ports: ["5432:5432"]
         options: >-
@@ -59,14 +59,11 @@ jobs:
       DB_USERNAME: postgres
       REDIS_URL: redis://localhost:6379/1
       ALLOWED_ORIGINS: http://localhost:5173
+      # Test-only values. Specs never call real services, so no real secret is needed.
+      SECRET_KEY_BASE: ci-test-only-not-a-secret
+      GEMINI_API_KEY: test-key
     steps:
       - uses: actions/checkout@v7
-      # Specs never call real services, so random values made fresh for each
-      # run are enough. Nothing secret-like is stored in this file.
-      - name: Create throwaway values for this run
-        run: |
-          echo "SECRET_KEY_BASE=$(openssl rand -hex 64)" >> "$GITHUB_ENV"
-          echo "GEMINI_API_KEY=$(openssl rand -hex 16)" >> "$GITHUB_ENV"
       - uses: ruby/setup-ruby@v1
         with:
           working-directory: api
