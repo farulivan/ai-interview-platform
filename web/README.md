@@ -4,7 +4,7 @@
 
 - **Node.js** 22.12 or newer (the test runner, Vitest, needs it)
 - **npm** (comes with Node)
-- A running backend API server (default: `http://localhost:3000`)
+- A running backend API server (default: `http://localhost:3001`)
 
 ## Quick Start
 
@@ -25,8 +25,8 @@ VITE_API_BASE_URL=http://localhost:3001/api/v1
 # WebSocket base URL (no /api/v1)
 VITE_WS_BASE_URL=ws://localhost:3001
 
-# Dev auth token — replace with a real JWT from Rakamin platform
-VITE_DEV_TOKEN=<your-jwt-here>
+# Optional: skips the login page in local development. Leave empty to log in normally
+VITE_DEV_TOKEN=
 
 # Dev tenant context
 VITE_DEV_TENANT_ID=1
@@ -57,7 +57,7 @@ The app will be available at **http://localhost:5173**.
 | --------------------------- | -------- | --------------------------------------------------- |
 | `VITE_API_BASE_URL`        | Yes      | Backend REST API base URL                           |
 | `VITE_WS_BASE_URL`         | Yes      | WebSocket server URL (used for live audio streaming)|
-| `VITE_DEV_TOKEN`           | Yes      | JWT for authenticating in local development         |
+| `VITE_DEV_TOKEN`           | No       | Skips the login page in local development. Never set it for a production build |
 | `VITE_DEV_TENANT_ID`       | Yes      | Tenant ID for multi-tenant context                  |
 | `VITE_DEV_TENANT_NAME`     | Yes      | Tenant display name                                 |
 | `VITE_SPEED_TEST_PING_URL` | No       | Custom ping endpoint for hardware check speed test  |
