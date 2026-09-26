@@ -135,11 +135,12 @@ export type SkillComparisonResult = "match" | "gap" | "exceed" | "not_assessed";
 
 export interface SkillComparison {
   skill_label: string;
-  required_level: number;
-  candidate_level?: number;
+  expected_level: number;           // the level the vacancy asks for
+  candidate_level?: number | null;  // null when the skill has no level
   result: SkillComparisonResult;
-  delta?: number;
-  is_override?: boolean;
+  delta?: number | null;
+  skill_status?: SkillStatus | null; // which kind of absence; null when the report lacks the skill
+  is_override?: boolean;             // older reports don't send it: treat as false
 }
 
 export interface FitGapReport {
