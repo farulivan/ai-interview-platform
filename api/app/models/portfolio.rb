@@ -18,7 +18,9 @@ class Portfolio < ApplicationRecord
   validates :generation_status, inclusion: { in: GENERATION_STATUSES }
   validates :failure_kind, inclusion: { in: FAILURE_KINDS }, allow_nil: true
 
-  before_save :stamp_status_change, if: :will_save_change_to_generation_status?
+  # Also on create: the database default fills the column, but Rails doesn't
+  # read it back, so the new object would hold nil.
+  before_save :stamp_status_change, if: -> { new_record? || will_save_change_to_generation_status? }
 
   scope :complete,    -> { where(generation_status: 'complete') }
   scope :failed,      -> { where(generation_status: 'failed') }

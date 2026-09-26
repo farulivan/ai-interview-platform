@@ -40,6 +40,11 @@ RSpec.describe Portfolio do
   end
 
   describe 'status_changed_at' do
+    it 'is set on a new report straight away, not only in the database' do
+      expect(create(:portfolio, generation_status: 'pending').status_changed_at)
+        .to be_within(5.seconds).of(Time.current)
+    end
+
     it 'moves when the status changes' do
       portfolio = create(:portfolio, generation_status: 'generating')
       portfolio.update_column(:status_changed_at, 1.hour.ago)
