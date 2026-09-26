@@ -1,17 +1,15 @@
 # frozen_string_literal: true
 
 # A realistic demo day for the assessor home, with fictional people only.
-#   bin/rails demo:seed                 # tenant "Demo Tenant"
-#   DEMO_TENANT="Acme" bin/rails demo:seed
+#   bin/rails demo:seed                      # the only organization, if there is one
+#   DEMO_TENANT="test-corp" bin/rails demo:seed  # by name, scheme or identifier
 # It REPLACES the tenant's assessments and interviews. It never runs in production.
 namespace :demo do
   desc "Replace this tenant's interview data with a realistic demo day (local only)"
   task seed: :environment do
     abort 'demo:seed never runs in production.' if Rails.env.production?
 
-    org = Organization.find_by(name: ENV.fetch('DEMO_TENANT', 'Demo Tenant')) ||
-          abort("No organization named #{ENV.fetch('DEMO_TENANT', 'Demo Tenant')}. Run bin/rails db:seed first.")
-    DemoDay.new(org).call
+    DemoDay.new(DemoDay.organization(ENV['DEMO_TENANT'].presence)).call
   end
 end
 
@@ -21,6 +19,17 @@ class DemoDay
     'Senior Frontend Engineer' => ['React / Frontend Development', 'System Design', 'Testing'],
     'Customer Service Officer' => ['Communication', 'Empathy', 'Problem Solving']
   }.freeze
+
+  # By name, scheme or identifier; without one, the only organization there is.
+  # (The web app's tenant label comes from VITE_DEV_TENANT_NAME, not the database.)
+  def self.organization(wanted)
+    found = wanted ? Organization.where('? IN (name, scheme, identifier)', wanted).to_a : Organization.all.to_a
+    return found.first if found.size == 1
+
+    known = Organization.pluck(:name, :scheme).map { |name, scheme| "#{name} (#{scheme})" }.join(', ')
+    abort('No organization yet. Run bundle exec rails db:seed first.') if known.empty?
+    abort(wanted ? "No organization matches #{wanted.inspect}. Known: #{known}." : "Several organizations exist: #{known}. Set DEMO_TENANT to one of them.")
+  end
 
   def initialize(org)
     @org = org
