@@ -36,7 +36,7 @@ module Api
           return json_error("Portfolio can only be regenerated when status is 'failed'", :unprocessable_entity)
         end
 
-        portfolio.update!(generation_status: "pending", generation_error: nil)
+        portfolio.update!(generation_status: "pending", generation_error: nil, failure_kind: nil)
         PortfolioGeneratorWorker.perform_async(@session.id)
 
         json_response(

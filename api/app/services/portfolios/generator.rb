@@ -20,23 +20,40 @@ module Portfolios
         generation_status: 'pending'
       )
 
-      portfolio.update!(generation_status: 'generating')
+      # Another job has it, or it is already done.
+      return portfolio unless portfolio.claim!
 
-      prompt   = build_prompt
-      response = @gemini_client.generate_content(prompt, temperature: 0.2)
+      # Nothing was said, so there is nothing to rate. Asking the AI anyway
+      # would only invent a report, and trying again can't help.
+      unless @session.transcript_turns.exists?
+        portfolio.fail!('no_interview_data', 'The interview has no transcript turns')
+        return portfolio
+      end
 
+      response = @gemini_client.generate_content(build_prompt, temperature: 0.2)
       save_skills(portfolio, response)
-      portfolio.update!(generation_status: 'complete', generated_at: Time.current)
 
       Rails.logger.info("[N10] Portfolio generated for session #{@session.id}")
       portfolio
     rescue => e
-      portfolio&.update!(generation_status: 'failed', generation_error: e.message)
+      # The job queue retries, and marks the report failed after the last try.
+      portfolio&.retry_later!(failure_kind_for(e), e.message)
       Rails.logger.error("[N10] Portfolio generation failed for session #{@session.id}: #{e.class} #{e.message}")
       raise
     end
 
     private
+
+    # Anything else is an error on our side. It is retried too, but has no
+    # kind, because it is neither the AI's fault nor missing data.
+    def failure_kind_for(error)
+      case error
+      when Gemini::HttpClient::EmptyResponseError, JSON::ParserError, SkillResolver::InvalidAnswer
+        'model_response_invalid'
+      when Gemini::HttpClient::ApiError # includes timeouts and rate limits
+        'model_unavailable'
+      end
+    end
 
     def build_prompt
       assessment       = @session.assessment
@@ -151,9 +168,17 @@ module Portfolios
       answer = response.is_a?(Hash) ? response : JSON.parse(response)
       rows   = SkillResolver.new(coverage_maps: @session.coverage_maps.order(:id).to_a, answer: answer).call
 
-      # Destroy existing skills (idempotent regeneration)
-      portfolio.portfolio_skills.destroy_all
-      rows.each { |attributes| portfolio.portfolio_skills.create!(attributes) }
+      # All or nothing: if anything fails half way, the previous skills stay.
+      # The rows are written by portfolio_id, not through portfolio.portfolio_skills:
+      # rows held in that list would be saved again by the next portfolio.update!
+      # (Rails autosave), even after the transaction rolled back.
+      Portfolio.transaction do
+        PortfolioSkill.where(portfolio_id: portfolio.id).destroy_all
+        rows.each { |attributes| PortfolioSkill.create!(attributes.merge(portfolio_id: portfolio.id)) }
+        portfolio.update!(generation_status: 'complete', generated_at: Time.current,
+                          failure_kind: nil, generation_error: nil)
+      end
+      portfolio.portfolio_skills.reset # callers read the saved rows, never a stale list
     end
   end
 end

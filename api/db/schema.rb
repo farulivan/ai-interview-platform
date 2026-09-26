@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_26_113859) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_26_121815) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -133,8 +133,11 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_26_113859) do
     t.enum "generation_status", default: "pending", null: false, enum_type: "generation_status"
     t.datetime "generated_at"
     t.text "generation_error"
+    t.string "failure_kind"
+    t.datetime "status_changed_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.index ["candidate_id"], name: "index_portfolios_on_candidate_id"
     t.index ["session_id"], name: "index_portfolios_on_session_id", unique: true
+    t.check_constraint "failure_kind IS NULL OR (failure_kind::text = ANY (ARRAY['model_unavailable'::character varying, 'model_response_invalid'::character varying, 'no_interview_data'::character varying]::text[]))", name: "chk_portfolios_failure_kind"
   end
 
   create_table "sessions", force: :cascade do |t|
