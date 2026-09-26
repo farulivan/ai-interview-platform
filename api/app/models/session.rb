@@ -25,9 +25,11 @@ class Session < ApplicationRecord
   def ended?   = status == 'ended'
   def pending? = status == 'pending'
 
+  # The link a candidate opens. The page lives in the web app, not in this API.
+  # APP_BASE_URL is the old name, still read so existing setups keep working.
   def invite_url
-    base = ENV.fetch('APP_BASE_URL', 'http://localhost:3001')
-    "#{base}/interview/#{invite_token}"
+    base = ENV['WEB_APP_URL'].presence || ENV['APP_BASE_URL'].presence || 'http://localhost:5173'
+    "#{base.chomp('/')}/interview/#{invite_token}"
   end
 
   private
