@@ -24,6 +24,8 @@ export default defineConfig({
     test: {
         environment: "jsdom",
         setupFiles: ["./src/test/setup.ts"],
+        // Vitest empties CSS files by default; the colour-contrast test reads the real index.css.
+        css: { include: [/src\/index\.css/] },
         coverage: {
             provider: "v8",
             reporter: ["text", "html"],
