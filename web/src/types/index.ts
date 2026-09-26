@@ -85,16 +85,22 @@ export interface Portfolio {
   overrides: AssessorOverride[];
 }
 
+export type SkillStatus = "assessed" | "thin_evidence" | "not_assessed" | "unavailable";
+
 export interface PortfolioSkill {
   id: number;
   skill_id?: number;
   skill_label: string;
   is_discovered: boolean;
-  ai_level: string;       // "L1" | "L2" | "L3" | "L4" | "L5"
-  ai_confidence: string;  // "high" | "medium" | "low"
+  status: SkillStatus;
+  ai_level: number | null;        // null when the skill has no level (not assessed, or could not be evaluated)
+  ai_confidence: string | null;   // "high" | "medium" | "low"; null when there is no level
   evidence: string[];
-  competency_summary: string;
+  competency_summary: string | null;
 }
+
+/** A skill that has a level: assessed, or rated on thin evidence. The API always sends its confidence. */
+export type RatedSkill = PortfolioSkill & { ai_level: number; ai_confidence: string };
 
 export interface AssessorOverride {
   id: number;
