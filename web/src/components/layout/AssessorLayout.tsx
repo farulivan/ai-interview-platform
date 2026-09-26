@@ -3,11 +3,12 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { tenantAtom } from "@/stores/tenantAtom";
 import { authAtom, clearToken } from "@/stores/authAtom";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ClipboardList, Briefcase, LogOut } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Briefcase, Home, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "react-router-dom";
 
 const navItems = [
+  { href: "/", label: "Home", icon: Home },
   { href: "/assessments", label: "Assessments", icon: ClipboardList },
   { href: "/vacancies", label: "Vacancies", icon: Briefcase },
 ];
@@ -30,7 +31,7 @@ export default function AssessorLayout() {
       <header className="border-b bg-white sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link to="/assessments" className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2">
               <LayoutDashboard className="h-5 w-5 text-primary" />
               <span className="font-semibold text-sm">Rakamin AI Interview</span>
             </Link>
@@ -41,7 +42,7 @@ export default function AssessorLayout() {
                   to={href}
                   className={cn(
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors",
-                    location.pathname.startsWith(href)
+                    (href === "/" ? location.pathname === "/" : location.pathname.startsWith(href))
                       ? "bg-primary/10 text-primary font-medium"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
