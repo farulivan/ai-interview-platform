@@ -89,6 +89,19 @@ RSpec.describe 'Portfolio reports', type: :request do
     end
   end
 
+  describe 'POST /api/v1/portfolios/:id/fitgap' do
+    it 'refuses a report that is not complete' do
+      portfolio = report('complete')
+      create(:portfolio_skill, portfolio: portfolio, status: 'unavailable', ai_level: nil, ai_confidence: nil)
+      vacancy = create(:vacancy, tenant_id: organization.id)
+
+      post "/api/v1/portfolios/#{portfolio.id}/fitgap", params: { vacancy_id: vacancy.id }, headers: headers
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(body['errors'].first['code']).to eq('report_not_complete')
+    end
+  end
+
   describe 'GET /api/v1/portfolios/:id/export' do
     it 'refuses to export a report that is not complete' do
       portfolio = report('complete')

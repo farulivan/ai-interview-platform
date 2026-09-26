@@ -44,10 +44,7 @@ module Api
         end
 
         report = Portfolios::ReportPresenter.new(@portfolio)
-        unless report.exportable?
-          return json_error("Only a complete report can be exported (this one is #{report.state})",
-                            :unprocessable_entity, code: "report_not_complete")
-        end
+        return report_not_complete(report) unless report.exportable?
 
         if format == "pdf"
           vacancy = params[:vacancy_id].present? ? Vacancy.find_by(id: params[:vacancy_id]) : nil
@@ -79,9 +76,8 @@ module Api
         vacancy = Vacancy.find_by(id: vacancy_id)
         return json_error("Vacancy not found", :not_found) unless vacancy
 
-        unless portfolio.complete?
-          return json_error("Portfolio is not ready (status: #{portfolio.generation_status})", :unprocessable_entity)
-        end
+        report = Portfolios::ReportPresenter.new(portfolio)
+        return report_not_complete(report) unless report.exportable?
 
         FitGapReport.find_by(portfolio_id: portfolio.id, vacancy_id: vacancy.id)&.destroy
         FitGapGeneratorWorker.perform_async(portfolio.id, vacancy.id)
@@ -101,9 +97,8 @@ module Api
         vacancy = Vacancy.find_by(id: vacancy_id)
         return json_error("Vacancy not found", :not_found) unless vacancy
 
-        unless portfolio.complete?
-          return json_error("Portfolio is not ready (status: #{portfolio.generation_status})", :unprocessable_entity)
-        end
+        report = Portfolios::ReportPresenter.new(portfolio)
+        return report_not_complete(report) unless report.exportable?
 
         # Return cached report if it exists and portfolio has no new overrides
         existing = FitGapReport.find_by(portfolio_id: portfolio.id, vacancy_id: vacancy.id)
@@ -149,6 +144,12 @@ module Api
         end
       rescue ActiveRecord::RecordNotFound
         json_error("Portfolio not found", :not_found)
+      end
+
+      # Exports and fit/gap only use a complete report, with every skill accounted for.
+      def report_not_complete(report)
+        json_error("Only a complete report can be used (this one is #{report.state})",
+                   :unprocessable_entity, code: "report_not_complete")
       end
 
       def report_not_started
