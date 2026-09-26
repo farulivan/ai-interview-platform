@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- **Node.js** (v18+ recommended)
+- **Node.js** 22.12 or newer (the test runner, Vitest, needs it)
 - **npm** (comes with Node)
 - A running backend API server (default: `http://localhost:3000`)
 
@@ -47,6 +47,9 @@ The app will be available at **http://localhost:5173**.
 | `npm run dev`       | Start Vite dev server with HMR       |
 | `npm run build`     | Type-check with `tsc` then build     |
 | `npm run preview`   | Preview the production build locally |
+| `npm test`          | Run all tests once (Vitest)          |
+| `npm run test:watch`| Run tests again on every change      |
+| `npm run coverage`  | Run tests with a coverage report     |
 
 ## Environment Variables
 
