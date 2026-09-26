@@ -6,14 +6,15 @@ import { Button } from "@/components/ui/button";
 import EvidenceStrip from "./EvidenceStrip";
 import { duration, relativeTime } from "@/lib/time";
 import type { LiveItem, NeedsYouItem, ResultItem, Section } from "@/types/home";
+import { Badge } from "@/components/ui/badge";
 
 const nameOf = (name: string | null) => name?.trim() || "Unnamed candidate";
 const resultsPath = (assessmentId: number, sessionId: number) =>
   `/assessments/${assessmentId}/sessions/${sessionId}/portfolio`;
 
 // A module with its heading, and its own loading, error and empty states.
-function Module<T>({ id, title, count, section, loading, onRetry, empty, children }: {
-  id: string; title: string; count?: number; section?: Section<T>; loading: boolean;
+function Module<T>({ id, title, count, extra, section, loading, onRetry, empty, children }: {
+  id: string; title: string; count?: number; extra?: string; section?: Section<T>; loading: boolean;
   onRetry: () => void; empty: (data: T) => ReactNode | null; children: (data: T) => ReactNode;
 }) {
   const heading = `${id}-heading`;
@@ -22,6 +23,7 @@ function Module<T>({ id, title, count, section, loading, onRetry, empty, childre
       <h2 id={heading} tabIndex={-1} className="text-base font-semibold">
         {title}
         {count !== undefined && <span className="text-muted-foreground"> · {count}</span>}
+        {extra && <span className="text-muted-foreground"> · {extra}</span>}
       </h2>
       <div className="mt-3">
         {loading || !section ? (
@@ -181,9 +183,11 @@ export function LiveNow(props: ModuleProps<LiveItem[]>) {
 
 export function ResultsToRead(props: ModuleProps<{ total: number; items: ResultItem[] }>) {
   const s = props.section;
+  const fresh = s?.status === "ok" ? s.data.items.filter((r) => r.new).length : 0;
   return (
     <Module
-      id="results" title="Results to read" count={s?.status === "ok" ? s.data.total : undefined} {...props}
+      id="results" title="Results to read" count={s?.status === "ok" ? s.data.total : undefined}
+      extra={fresh > 0 ? `${fresh} new` : undefined} {...props}
       empty={(d) => d.items.length === 0 ? <p className="text-sm text-muted-foreground">No new results this week.</p> : null}
     >
       {(d) => (
@@ -194,7 +198,17 @@ export function ResultsToRead(props: ModuleProps<{ total: number; items: ResultI
               <Row
                 key={r.session_id}
                 icon={<Clock className="h-4 w-4 text-muted-foreground" />}
-                title={`${name} · ${r.reference}`}
+                title={
+                  <>
+                    {name} · {r.reference}
+                    {r.new && " "}
+                    {r.new && (
+                      <Badge variant="secondary" className="ml-2 align-middle" title="New since your last visit on this device">
+                        New
+                      </Badge>
+                    )}
+                  </>
+                }
                 meta={
                   <div className="space-y-1.5">
                     <p>{r.assessment.name} · {relativeTime(r.generated_at)} · {duration(r.duration_seconds)}</p>
