@@ -17,7 +17,7 @@ GEMINI_API_KEY: "your_gemini_api_key"
 # "Check your Gemini models".
 GEMINI_LIVE_MODEL: "gemini-3.1-flash-live-preview"
 GEMINI_FLASH_MODEL: "gemini-2.5-flash"
-GEMINI_PRO_MODEL: "gemini-3.8-flash"
+GEMINI_PRO_MODEL: "gemini-3.6-flash"
 
 # Web app URL, used in candidate invite links
 WEB_APP_URL: "http://localhost:5173"

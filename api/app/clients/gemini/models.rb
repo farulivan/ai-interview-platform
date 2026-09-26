@@ -8,7 +8,7 @@ module Gemini
     DEFAULTS = {
       live: 'gemini-3.1-flash-live-preview', # the voice interview
       flash: 'gemini-2.5-flash',             # coverage analysis and fit/gap notes
-      pro: 'gemini-3.8-flash'                # the final skill report
+      pro: 'gemini-3.6-flash'                # the final skill report
     }.freeze
 
     def self.live

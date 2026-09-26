@@ -24,7 +24,7 @@ Fill in the required values in `config/application.yml`:
 | `GEMINI_API_KEY` | Google AI Studio API key |
 | `GEMINI_LIVE_MODEL` | Model for the voice interview, e.g. `gemini-3.1-flash-live-preview` |
 | `GEMINI_FLASH_MODEL` | Model for coverage analysis and fit/gap notes, e.g. `gemini-2.5-flash` |
-| `GEMINI_PRO_MODEL` | Model for the final skill report: the strongest one your key can use, e.g. `gemini-3.8-flash` |
+| `GEMINI_PRO_MODEL` | Model for the final skill report: a strong model that answers reliably for your key, e.g. `gemini-3.6-flash` |
 | `REDIS_URL` | e.g. `redis://localhost:6379/1` |
 | `ALLOWED_ORIGINS` | CORS origin for the frontend, e.g. `http://localhost:5173` |
 | `WEB_APP_URL` | Web app URL, used in candidate invite links, e.g. `http://localhost:5173`. The old name `APP_BASE_URL` still works |
