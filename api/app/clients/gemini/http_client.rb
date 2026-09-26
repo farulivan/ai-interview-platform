@@ -16,6 +16,8 @@ module Gemini
 
     class RateLimitError < ApiError; end
     class TimeoutError < ApiError; end
+    # The call worked, but the answer had no text in it.
+    class EmptyResponseError < ApiError; end
 
     # generateContent is a POST, but calling it again changes nothing, so short
     # errors (rate limit, "busy", a dropped connection) are safe to retry.
@@ -94,7 +96,7 @@ module Gemini
       data = JSON.parse(response.body)
       text = data.dig('candidates', 0, 'content', 'parts', 0, 'text')
 
-      raise ApiError.new("No content in Gemini response") unless text
+      raise EmptyResponseError.new("No content in Gemini response") unless text
 
       # Strip markdown code fences if present (e.g. ```json ... ```)
       cleaned = text.strip.sub(/\A```(?:json)?\s*/, '').sub(/\s*```\z/, '')

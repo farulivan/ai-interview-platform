@@ -37,6 +37,12 @@ RSpec.describe Gemini::HttpClient do
     expect(a_request(:post, url)).to have_been_made.once
   end
 
+  it 'raises a separate error when the answer has no text, so it is not taken for an outage' do
+    stub_request(:post, url).to_return(status: 200, body: { candidates: [] }.to_json)
+
+    expect { client.generate_content('hi') }.to raise_error(Gemini::HttpClient::EmptyResponseError)
+  end
+
   it 'retries when it cannot connect, then returns the answer' do
     stub_request(:post, url).to_raise(Net::OpenTimeout).then.to_return(status: 200, body: answer)
 
