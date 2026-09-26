@@ -11,7 +11,7 @@ import { readLastVisit, rememberVisit } from "@/lib/lastVisit";
 import { clockTime, greeting, longDate, relativeTime } from "@/lib/time";
 import type { HomeDesk } from "@/types/home";
 
-// The review desk (design dashboard-uiux 02, 04): what needs a person now.
+// The review desk: what needs a person now.
 export default function HomePage() {
   const [desk, setDesk] = useState<HomeDesk | null>(null);
   const [loading, setLoading] = useState(true);
