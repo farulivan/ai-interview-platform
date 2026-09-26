@@ -9,7 +9,7 @@ RSpec.describe Gemini::Models do
     with_env(no_model_vars) do
       expect(described_class.live).to eq('gemini-3.1-flash-live-preview')
       expect(described_class.flash).to eq('gemini-2.5-flash')
-      expect(described_class.pro).to eq('gemini-3.8-flash')
+      expect(described_class.pro).to eq('gemini-3.6-flash')
     end
   end
 
