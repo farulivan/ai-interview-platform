@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Home
-  # The review desk: what needs a person now (design dashboard-uiux 05).
+  # The review desk: what needs a person now.
   # Every section is built on its own, so one failing section never blanks
   # the page. No levels, confidence, quotes or summaries leave this class:
   # names and references are enough to act.
@@ -80,7 +80,7 @@ module Home
 
     # Failed on our side in the last 14 days, and not re-invited yet. Until an
     # exact re-invite link exists, a newer invite for the same name in the same
-    # assessment counts as a re-invite (design 04 HD-03).
+    # assessment counts as a re-invite.
     def failed_interviews
       @failed_interviews ||= Session.includes(:assessment)
                                     .where("status = 'failed' OR end_reason = 'error'")

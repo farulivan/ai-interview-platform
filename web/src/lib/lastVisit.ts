@@ -1,6 +1,6 @@
-// The desk says "new" only against the last visit on this device (design
-// dashboard-uiux 04 HD-02). Storage can be missing or blocked, so every read
-// and write is guarded, and the page works without it.
+// The desk says "new" only against the last visit on this device. Storage
+// can be missing or blocked, so every read and write is guarded, and the page
+// works without it.
 const KEY = "rakamin.home.lastVisit";
 
 export function readLastVisit(storage: Storage | undefined = globalThis.localStorage): string | null {
