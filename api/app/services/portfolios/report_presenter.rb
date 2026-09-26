@@ -102,8 +102,11 @@ module Portfolios
       }
     end
 
-    # The skills this interview set out to cover.
+    # The skills this interview set out to cover: the report's own list once it
+    # exists (so the counts always add up), before that the interview's coverage.
     def total_skills
+      return skills.count { |skill| !skill.is_discovered } if ready?
+
       configured_maps = @session.coverage_maps.count { |map| !map.is_discovered }
       configured_maps.positive? ? configured_maps : @session.assessment.assessment_skills.size
     end
